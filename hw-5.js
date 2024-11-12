@@ -2,7 +2,7 @@
 z.set({dist:0.35})
 z.q=16
 
-let loop = Math.floor(z.q*0.75)
+let loop = Math.floor(z.q)
 
 // circuit
 let p = i => $set(d.holywrit)
@@ -19,9 +19,11 @@ q3.fb(2).ry(p(3)).rz(p(7)).ry(p(11)).rz(p(15))
 // all streams
 streams.slice(0,16).map((s,i) => {
   s.x.qphase(i)
-  s.y.qpb(i).mul(10)
-  s.e.qm(i%6)
-    .degrade(0.75)
+    // .add($noise())
+  s.y.qpb(i)
+    .mul(10)
+  s.e.qm(i%4)
+    .degrade(0.5)
     .cache(loop,8)
   s.m.not(s.e)
 });
@@ -36,60 +38,68 @@ let breaks = s3
 let bass = s5
 let noise = s6;
 let noise2 = s7;
-let drone = s8;
 
-z.bpm.set(160)
+z.bpm.set(180)
 
 // streams toggle between samp and grains
-;[breaks,noise2].map(st => {
-  st.p.inst.io(kick.e,sn.e).if(2,1)
+;[kick,sn,breaks,noise,noise2,hh,bass].map(st => {
+  st.p.inst.toggle(kick.e).if(2,1)
+  st.p._grainrate.set(st.y).mtr(1,32).step(1)
   st.p.rate.set(st.p.inst).eq(1)
     .if(1,$set(st.y).mtr(0.5,1).step(0.25))
 })
 
-kick.set({inst: 1, bank: 'kick.808', cut: [kick.i, bass.i, noise.i, breaks.i],cutr:ms(0.5),vol:1.75})
-kick.p.n.set(bassp).sub(31).mod(12).add(60)
-kick.p.i.set(kick.x).mul(16).step(1)
-kick.e.or('1|0|*3')
+kick.set({inst: 1, bank: 'kick.808', cut: [kick.i, bass.i],cutr:ms(0.5),vol:1.75})
+kick.p._n.set(bassp).sub(31).mod(12).add(60)
+kick.p.i.set($qm(0).if($random(0,16).step(1), 0))
+kick.p.amp.set($qm(0).if($random(0.25,0.5), 1))
+kick.e
+  .degrade(0.8)
+  .or('3:8|2:8|1:8')
 
-sn.set({inst: 1, bank:'claps.rare', i: 3, fx0:0.125, vol:1.25,
-  cut: [0,1,2,3,4,5,6]
+sn.set({inst: 1, bank:'clap808', i: '6', fx0:0.125, vol:1.5,
+  cut: [0,1,2,3,4,5,6,7]
 })
-sn.p.pan.set(breaks.p._pan).subr(1)
-sn.e.reset().set('0 0 0 1 0 0 0 0 | 0')
+sn.p.s.set(sn.y).mtr(0.1,0.5)
+sn.p.dur.set(sn.x).mtr(1,0.1).btms()
+sn.e.reset().set('0 0 0 1?0 0 0 0 0 |*8')
 
 bass.set({inst: 1, cut:bass.i, bank: 'lb02', dur:ms(4),dist:0,vol:1.5})
-bass.p.i.set('4')
+bass.p.i.set(4)
 bass.p.n.set(bassp).sub(24).mod(12).add(60)
-bass.e.reset().set(kick.e)
+bass.e
+  .and($not(kick.e))
+  .or(sn.e)
+  .and($odd())
 
-hh.set({inst: 1, snap:z.q, lc:0.75, dur:ms(8), vol:1.5, cut:breaks.i})
+hh.set({inst: 1, snap:z.q*2, lc:0.75, dur:ms(8), vol:1, bank:'breaks.tech'})
 hh.e.reset().set(kick.e).or(sn.e)
   .and('1*16|*4 0*16|*2')
-hh.p._pan.set(hh.x).mtr(0.1,0.7)
+hh.p._pan.set(breaks.p._pan).subr(1)
 hh.p.i.set(hh.x).mul(16).step(1)
 hh.p.begin.set(kick.e).if(0, $saw(0,1,1))
-hh.p.bank.set(kick.e).if('breaks.tech', 'gm.glitch.2b')
 
-breaks.set({cut: [breaks.i,bass.i,hh.i], bank: 'breaks.hp', lc:0.3, dur:ms(4), acurve:0.75, vol:1, hc:0.3})
+breaks.set({cut: [breaks.i,hh.i], bank: 'breaks.90.4b', lc:0.3, dur:ms(4), acurve:0.75, vol:1})
 breaks.p.a.set(kick.e).if(1,0).btms()
-breaks.p._pan.set(breaks.y).mtr(0.75,0.3)
-breaks.p.snap.set(kick.e).if(1,2).mul(z.q)
+breaks.p._pan.noise(0.25,0.75,1/4)
+breaks.p.snap.set(kick.e).if(2,3).mul(z.q)
 breaks.p.i.set(breaks.y).mul(4).step(1)
+breaks.p._grainrate.set(breaks.y).mtr(1,32).step(1)
+breaks.p._hc.set(breaks.y).mtr(1,0.75)
 breaks.p.fx0.set(breaks.y).mtr(0,0.125)
 breaks.p.begin.saw(0,1,1/4)
 breaks.e.or(kick.e)
   .and('1*16|*6 0*16|*2')
   .and($every(2).or($every(3)))
 
-noise.set({inst: 1, bank: 'tune.02',snap:z.q*1.75, fx0:0.5, lc:0.5})
-noise.p.i.set(noise.y).mul(5).step(1).seq([6,7,8,9,10,11])
+noise.set({inst: 1, bank: 'tune.02',snap:z.q*1.75, fx0:0.5, lc:0.5,vol:1.5})
+noise.p.i.set(noise.y).mtr(6,10).step(1)
 noise.p.begin.saw(0,1,1/7)
 noise.p.dur.midifile(bassfile, 'dur').btms()
 noise.e.set(kick.e)
 
-noise2.set({inst: 1, bank: 'gm.horror', lc:0.5, a:ms(2), acurve:0.75, dur:ms(4), vol:1.5,lag:ms(2)})
-noise2.p.i.random(0,32).step(1)
+noise2.set({inst: 1, bank: 'tune.02', lc:0.5, a:ms(2), acurve:0.75, dur:ms(4), vol:2,lag:ms(2)})
+noise2.p.i.random(18,23).step(1)
 noise2.p.begin.saw(0,1,1/4)
 noise2.p._fx0.set(noise2.y).mtr(0,0.25)
 noise2.p._level.set(noise2.y).subr(1).mul(0.25)
