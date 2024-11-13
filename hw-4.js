@@ -47,12 +47,12 @@ z.bpm.set(160)
     .if(1,$set(st.y).mtr(0.5,1).step(0.25))
 })
 
-kick.set({inst: 1, bank: 'kick.808', cut: [kick.i, bass.i, noise.i, breaks.i],cutr:ms(0.5),vol:1.75})
+kick.set({inst: 1, bank: 'kick.808', cut: [kick.i, bass.i, noise.i, breaks.i],cutr:ms(0.5),vol:1.5})
 kick.p.n.set(bassp).sub(31).mod(12).add(60)
 kick.p.i.set(kick.x).mul(16).step(1)
 kick.e.or('1|0|*3')
 
-sn.set({inst: 1, bank:'claps.rare', i: 3, fx0:0.125, vol:1.25,
+sn.set({inst: 1, bank:'claps.rare', i: 3, fx0:0.125, vol:1.1,
   cut: [0,1,2,3,4,5,6]
 })
 sn.p.pan.set(breaks.p._pan).subr(1)
@@ -71,7 +71,7 @@ hh.p.i.set(hh.x).mul(16).step(1)
 hh.p.begin.set(kick.e).if(0, $saw(0,1,1))
 hh.p.bank.set(kick.e).if('breaks.tech', 'gm.glitch.2b')
 
-breaks.set({cut: [breaks.i,bass.i,hh.i], bank: 'breaks.hp', lc:0.3, dur:ms(4), acurve:0.75, vol:1, hc:0.3})
+breaks.set({cut: [breaks.i,bass.i,hh.i], bank: 'breaks.hp', lc:0.3, dur:ms(4), acurve:0.75, vol:0.7, hc:0.3})
 breaks.p.a.set(kick.e).if(1,0).btms()
 breaks.p._pan.set(breaks.y).mtr(0.75,0.3)
 breaks.p.snap.set(kick.e).if(1,2).mul(z.q)
@@ -82,10 +82,11 @@ breaks.e.or(kick.e)
   .and('1*16|*6 0*16|*2')
   .and($every(2).or($every(3)))
 
-noise.set({inst: 1, bank: 'tune.02',snap:z.q*1.75, fx0:0.5, lc:0.5})
+noise.set({inst: 1, bank: 'tune.02',snap:z.q*1.75, fx0:0.25, lc:0.5, vol: 1.5})
 noise.p.i.set(noise.y).mul(5).step(1).seq([6,7,8,9,10,11])
 noise.p.begin.saw(0,1,1/7)
 noise.p.dur.midifile(bassfile, 'dur').btms()
+noise.p._pan.noise(0.3,0.7)
 noise.e.set(kick.e)
 
 noise2.set({inst: 1, bank: 'gm.horror', lc:0.5, a:ms(2), acurve:0.75, dur:ms(4), vol:1.5,lag:ms(2)})
@@ -93,6 +94,7 @@ noise2.p.i.random(0,32).step(1)
 noise2.p.begin.saw(0,1,1/4)
 noise2.p._fx0.set(noise2.y).mtr(0,0.25)
 noise2.p._level.set(noise2.y).subr(1).mul(0.25)
+noise2.p._pan.set(1).sub(noise.p._pan)
 noise2.e.reset().set(sn.e)
 
 fx0.set({dfb:0.8,lc:0.3,_track:10,dtime:17.75})

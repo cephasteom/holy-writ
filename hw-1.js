@@ -19,8 +19,8 @@ qubits.slice(0,6).map((qubit,i,arr) => {
   const position = i%2 ? 2 : 0
   const entangle = isLast ? 0 : i+1
   qubit
-    // .fb(i)
-    // .rx($noise())
+    .fb(i)
+    .rx($noise())
     .ry($saw(0.2,0.4,1/4), position)
     .cx(entangle, isLast ? 1 : 0)
 });
@@ -48,7 +48,7 @@ streams.slice(0,10).map(st => {
 })
 
 kick.set({
-  inst:1,ba:'bd808',i:9,hc:0.75, vol: 1.75,
+  inst:1,ba:'bd808',i:9,hc:0.75, vol: 2,
   cut:[breaks.i,glitch1.i,glitch2.i,noise2.i,sub.i,lb.i]
 })
 kick.e.set('3:8')
@@ -60,7 +60,7 @@ clap.set({inst:1,bank:'clap',cut:[noise1.i,noise2.i,sub.i,lb.i,breaks.i]})
 clap.p.i.set([0,5]).at($set(clap.y).mul(2).step(1))
 clap.e.set('0 0 0 0 0 0 1 0 | 0')
 
-breaks.set({ba:'breaks.archn',snap:z.q,vol:0.85,a:ms(4),acurve:0.75,oneshot:1,s:0.25})
+breaks.set({ba:'breaks.archn',snap:z.q,vol:1,a:ms(4),acurve:0.75,oneshot:1,s:0.25})
 breaks.p.begin.set(breaks.y).step(0.125).subr(1)
 breaks.p.i.set(breaks.y).mul(16).step(1)
 breaks.e.set(kick.e)

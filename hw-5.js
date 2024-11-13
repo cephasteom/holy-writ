@@ -49,7 +49,7 @@ z.bpm.set(180)
     .if(1,$set(st.y).mtr(0.5,1).step(0.25))
 })
 
-kick.set({inst: 1, bank: 'kick.808', cut: [kick.i, bass.i],cutr:ms(0.5),vol:1.75})
+kick.set({inst: 1, bank: 'kick.808', cut: [kick.i, bass.i],cutr:ms(0.5),vol:1.5})
 kick.p._n.set(bassp).sub(31).mod(12).add(60)
 kick.p.i.set($qm(0).if($random(0,16).step(1), 0))
 kick.p.amp.set($qm(0).if($random(0.25,0.5), 1))

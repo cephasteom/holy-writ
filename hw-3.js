@@ -64,10 +64,11 @@ hh.set({inst:1, bank:'breaks.tech', snap:z.q, lc:0.5, i: 2, dur:ms(4)})
 hh.p.begin.saw(0,1,1/2).step(0.125)
 hh.e.reset().set(kick.e)
 
-breaks.set({ba:'gm.glitch.2b',snap:z.q*2,vol:1.25,
+breaks.set({inst:1,ba:'gm.glitch.2b',snap:z.q,vol:1.5,
   a:ms(2),acurve:0.75,
-  s:0.5,fx0:0.25,dur:ms(4),lc:0.3})
-breaks.p.begin.set(breaks.y).step(0.125).subr(1)
+  s:0.5,fx0:0.25,dur:ms(4),lc:0.3
+})
+breaks.p.begin.set(breaks.y).mtr(0,0.5).step(0.125)
 breaks.p.i.set(breaks.x).mul(16).step(1)
 breaks.e.set(kick.e)
   
@@ -112,17 +113,6 @@ noise2.p._pan.set(noise1.p._pan).subr(1)
 noise2.p.fx0.set(noise2.y).mul(0.5)
 noise2.e
   .set(glitch1.e)
-  .and($not(lb.e))
-
-sub.set({inst: 7, n:'36', dur:ms(1.5),
-  op2ratio:3,op2gain:0.125,
-  op3ratio:11,op3gain:0.25
-})
-sub.p.acurve.saw(0.75,0.5,1/8)
-sub.p.a.set(sub.y).saw(1.5,3).step(0.5).btms()
-sub.p.op2a.set(sub.p.a).mul(2)
-sub.p.op3a.set(sub.p.a).mul(2)
-sub.e.set(kick.e)
   .and($not(lb.e))
 
 lb.set({

@@ -9,26 +9,35 @@ let glitch2 = s7
 let noise1 = s8
 let noise2 = s9
 
-seed(2) // play around with this
-
-let pbs = $qpbs().fn(a => a.filter(p=>p>0.02))
-
 z.bpm.toggle(kick.e).if(180,140)
 z.set({dist:0.25})
 z.q=16
 
-let ps = [$noise(0.4,0.7),$random(0,1,1/5)]
+// d.fetch('https://zendata.cephasteom.co.uk/api/book/7', 'holywrit')
 
-q0.fb(3).ry(ps[0]).rz(ps[1]).cx([1],2)
-q1.fb(0).ry(ps[0]).rz(ps[1]).cx([2],1)
-q2.fb(1).ry(ps[0]).rz(ps[1]).cx([3],0)
-q3.fb(2).ry(ps[0]).rz(ps[1]);
+// circuit
+let loop = Math.floor(z.q*2)
+
+let p = i => $set(d.holywrit)
+  .at($t().mod(d.holywrit.length))
+  .at('params')
+  .at(i).or(0)
+  .mtr(0,1,-Math.PI*2,Math.PI*2)
+
+q0.fb(3).ry(p(0)).rz(p(4)).cx([1],2).ry(p(8)).rz(p(12))
+q1.fb(0).ry(p(1)).rz(p(5)).cx([2],1).ry(p(9),1).rz(p(13))
+q2.fb(1).ry(p(2)).rz(p(6)).cx([3],0).ry(p(10)).rz(p(14))
+q3.fb(2).ry(p(3)).rz(p(7)).ry(p(11)).rz(p(15))
 
 // all streams
-streams.slice(0,8).map((st,i) => {
-  st.y.qphase(i).add(i/16)
-  st.x.qpb(i).add(i/16)
-  st.m.every(1)
+streams.slice(0,16).map((s,i) => {
+  s.x.qphase(i)
+  s.y.qpb(i)
+    .mul(1)
+  s.e.qm(i%6)
+    .degrade('0.5|*3 0.75|*3')
+    .cache(loop,2)
+  s.m.not(s.e)
 });
 
 // streams triggered by circuit
@@ -55,17 +64,17 @@ kick.e
   .and($not(clap.e))
   .and($not(lb.e))
 
-clap.set({inst:1,bank:'claps.rare',cut:[noise1.i,noise2.i,sub.i,glitch2.i, hh.i]})
+clap.set({inst:1,bank:'claps.rare',cut:[noise1.i,noise2.i,sub.i,glitch2.i,hh.i],cutr:20})
 clap.p.i.set(clap.x).saw(2,12).step(3)
 clap.p.fx0.set(clap.y).mul(0.25)
 clap.e.set('0 0 1 0 0 0 0 0 |*3 0')
 
-hh.set({bank:'breaks.tech', snap:z.q, lc:0.5, i: 1, dur:ms(4),
-  a:ms(0.25), acurve:0.75
+hh.set({bank:'breaks.tech', snap:z.q, lc:0.5, i: 1, dur:ms(4), vol:0.75,
+  a:ms(0.25), acurve:0.75,
 })
 hh.e.reset().set(kick.e)
 
-breaks.set({ba:'breaks.90.4b',snap:z.q,vol:0.85,a:ms(1),acurve:0.75,oneshot:1,s:0.5,fx0:0.25})
+breaks.set({ba:'breaks.90.4b',snap:z.q,vol:1,a:ms(1),acurve:0.75,oneshot:1,s:0.5,fx0:0.25})
 breaks.p.begin.set(breaks.y).step(0.125).subr(1)
 breaks.p.i.set(breaks.x).mul(16).step(1)
 breaks.e.set(kick.e)
@@ -137,7 +146,7 @@ noise2.e
   // .set(glitch1.e)
   .and($not(lb.e))
 
-fx0.set({dfb:0.7,lc:0.25,_track:10,dist:0.5})
+fx0.set({dfb:0.7,lc:0.25,_track:9,dist:0.5})
 fx0.p.delay.toggle(kick.e).mul(0.75)
 fx0.p.reverb.toggle(kick.e).subr(1).mul(0.5)
     // .mul($saw(0.5,1,1/64))
