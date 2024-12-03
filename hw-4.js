@@ -102,3 +102,14 @@ fx0.p.delay.set(kick.p.n).mod(12).eq(0).mtr(0,0.75)
 fx0.p.reverb.toggle(kick.e).mul(0.5)
 fx0.p.rtail.io(sn.e,kick.e).mtr(0.1,0.35)
 fx0.e.set(kick.e).or(sn.e)
+
+// kick.e.set(0)
+sn.e.set(0)
+hh.e.set(0)
+breaks.e.set(0)
+bass.e.set(0)
+// noise.e.set(0)
+// noise2.e.set(0)
+// drone.e.set(0)
+
+// N.B. This is where the piece stops...

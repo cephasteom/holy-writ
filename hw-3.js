@@ -1,3 +1,5 @@
+// d.fetch('https://zendata.cephasteom.co.uk/api/book/7', 'holywrit')
+
 let kick = s0
 let clap = s1
 let hh = s2
@@ -139,14 +141,14 @@ fx0.e.every(1)
 fx0.m.every(1)
 
 // kick.e.set(0)
-// clap.e.set(0)
-hh.e.set(0)
-// breaks.e.set(0)
-// glitch1.e.set(0)
-// glitch2.e.set(0)
-// noise1.e.set(0)
-// noise2.e.set(0)
-// lb.e.set(0)
+clap.e.set(0)
+// hh.e.set(0)
+breaks.e.set(0)
+glitch1.e.set(0)
+glitch2.e.set(0)
+noise1.e.set(0)
+noise2.e.set(0)
+lb.e.set(0)
 
 // kick.mute.set('1?0*16')
 // clap.mute.set('1?0*16')

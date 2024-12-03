@@ -1,3 +1,7 @@
+d.fetch('https://zendata.cephasteom.co.uk/api/book/7', 'holywrit')
+
+// console.log(d.holywrit)
+
 let kick = s0
 let clap = s1
 let hh = s2
@@ -12,8 +16,6 @@ let noise2 = s9
 z.bpm.toggle(kick.e).if(180,140)
 z.set({dist:0.25})
 z.q=16
-
-// d.fetch('https://zendata.cephasteom.co.uk/api/book/7', 'holywrit')
 
 // circuit
 let loop = Math.floor(z.q*2)
@@ -31,9 +33,9 @@ q3.fb(2).ry(p(3)).rz(p(7)).ry(p(11)).rz(p(15))
 
 // all streams
 streams.slice(0,16).map((s,i) => {
-  s.x.qphase(i)
-  s.y.qpb(i)
-    .mul(1)
+  s.x.qphase(i).mod(1)
+  s.y.qpb(i).mod(1)
+    .mul(10)
   s.e.qm(i%6)
     .degrade('0.5|*3 0.75|*3')
     .cache(loop,2)
@@ -159,7 +161,7 @@ fx0.m.every(1)
 // kick.e.set(0)
 // sub.e.set(0)
 // clap.e.set(0)
-// hh.e.set(0)
+hh.e.set(0)
 // breaks.e.set(0)
 // glitch1.e.set(0)
 // glitch2.e.set(0)
@@ -167,11 +169,11 @@ fx0.m.every(1)
 // noise2.e.set(0)
 // lb.e.set(0)
 
-// kick.mute.set('1?0*16')
-// clap.mute.set('1?0*16')
-// breaks.mute.set(1)
-// glitch1.mute.set(1)
-// glitch2.mute.set(1)
-// noise1.mute.set(1)
-// noise2.mute.set(1)
-// fx0.mute.set(1)
+kick.mute.set('1?0*16')
+clap.mute.set('1?0*16')
+breaks.mute.set('1?0*16')
+glitch1.mute.set('1?0*16')
+glitch2.mute.set('1?0*16')
+noise1.mute.set('1?0*16')
+noise2.mute.set('1?0*16')
+// fx0.mute.set('1?0*16')

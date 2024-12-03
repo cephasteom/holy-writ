@@ -1,10 +1,12 @@
 let lo = $noise(40,60,1/3); 
 let hi = $noise(320,280,1/5);
-z.bpm.sine(lo,hi,'0.25|*3 0.125|*5 0.5|*3').step(1)
+// z.bpm.sine(lo,hi,'0.25|*3 0.125|*5 0.5|*3').step(1)
+z.bpm.cosine(hi,lo,1/4).step(1)
 
-let static1 = s0
-let noise1 = s1
-let tones = s2
+let static1 = s6
+let noise1 = s7
+let tones = s8
+let vox = s9
 
 static1.set({
   inst: 1, 
@@ -44,7 +46,7 @@ tones.set({inst:0,
 tones.p._n
   .set(z.bpm).mtr(0,16,lo,hi).step(1).add(1)
   .set('83 Ador%16..*15')
-tones.p._fx0.set(z.bpm).mtr(0,$saw(0.5,1,1/24),lo,hi)
+tones.p._fx0.set(z.bpm).mtr(0,$saw(0.25,0.5,1/24),lo,hi)
 tones.p._level.set(tones.p._fx0).subr(1)  
 tones.p.s.set(z.bpm).mtr(0.05,0.5,lo,hi)
 tones.p._modi.set(z.bpm).mtr(0.1,1,lo,hi)
@@ -55,9 +57,19 @@ tones.p.amp.set(z.bpm).mtr(0.25,1,lo,hi)
 tones.p._pan.set(static1.p.pan).subr(1).mtr(0.4,0.6)
 tones.m.not(tones.e)
 
-fx0.set({dfb:0.5,lc:0.3,_track:10,re:1,rtail:0.1,dtime:ms(1/100),dfb:0.85})
+vox.set({inst: 1, bank: 'vox.borges', 
+  i: 3, dur:ms(34), lc:0.3, vol:0.5, re:0.5, lag:ms(1)
+})
+vox.p._rate.noise(0.75,1.25,1/4)
+vox.e.every(z.q*8)
+vox.m.set(1)
+
+fx0.set({dfb:0.5,lc:0.3,_track:10,re:0.25,rtail:0.1,rsize:0.25,dtime:ms(1/100),dfb:0.85,de:0.25})
 fx0.p._dcolour.set(z.bpm).mtr(0.01,0.5,lo,hi)
 fx0.e.set(1)
 fx0.m.set(1)
 
-// tones.solo.set(1).degrade($saw(0,1,1/16))
+static1.mute.set(0)
+noise1.mute.set(1)
+tones.mute.set(1)
+vox.mute.set(1)
